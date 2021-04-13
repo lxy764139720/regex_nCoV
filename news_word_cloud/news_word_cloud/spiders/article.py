@@ -29,13 +29,14 @@ class ArticleSpider(scrapy.Spider):
         if bs.find('h1', {'id': 'p_title'}):
             # 文章页面
             article['url'] = response.url
-            article['title'] = bs.find('h1', {'id': 'p_title'}).get_text()
+            article['title'] = bs.find('h1', {'id': 'p_title'}).get_text().replace('\xa0', '')
             text = ''
             for content in bs.find('div', {'id': 'p_content'}).children:
                 if content.name == 'p':
                     # print(content.get_text())
                     text += content.get_text()
-            article['text'] = text.replace('\n', '').replace('\r', '').replace('\t', '').replace(u'\xa0', u'').replace(u'\u3000', u'')
+            article['text'] = text.replace('\n', '').replace('\r', '').replace('\t', '') \
+                .replace('\xa0', '').replace(u'\u3000', u'').replace(' ', '').replace(',', '，')
             # 20210306
             article['date'] = '2021' + re.findall(r'/2021npc/n1/2021/([0-9]{4})/[^/]+?.html', response.url)[0]
             yield article
